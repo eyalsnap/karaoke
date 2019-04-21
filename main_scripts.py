@@ -1,26 +1,10 @@
-# technique functions
-
 import os
 import re
 from selenium import webdriver
 from time import sleep
-from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
-import webbrowser
 
-
-def getEnglishLinesByFileName(fileName):
-    file = open(fileName)
-    data = file.readlines()
-    file.close()
-    return data
-
-
-def getHebrewLinesByFileName(fileName):
-    file = open(fileName, encoding="utf8")
-    data = file.readlines()
-    file.close()
-    return data
+from song import Song
 
 
 def changeFolder():
@@ -38,7 +22,7 @@ def changeFolder():
 
 
 # creating url of youtube result by given singer and song name
-def createSearchName(singerName, songName):
+def create_youtube_url_for_download(singerName, songName):
     ### getting into youtube by searching the song and the singer
     # the beginning of the search url
     searchStart = "https://www.youtube.com/results?search_query="
@@ -78,7 +62,7 @@ def findNewUrl(fullPath):
     regex = '"https:\/\/i.ytimg.com\/vi\/([^\/]+)\/hqdefault.jpg'
 
     # getting into the web in the given url
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
     driver.get(fullPath)
 
     # extracting the the page source of the youtube results page
@@ -95,23 +79,9 @@ def findNewUrl(fullPath):
 
 ################################################
 
-# running over the folder
-
-# a function that waits while there is a file that is in downloading procces
-def checkIfStillDownload():
-    directory = findDownloadFolder()
-    still = 1
-    while (still == 1):
-        still = 0
-        # checking if there is a file that its download wasnt finished
-        for fileName in os.listdir(directory):
-            if fileName.endswith(".crdownload"):
-                still = 1
-
-
 # a function that changes the name of the last song that was downloaded
 def changeNames(singer, song):
-    directory = findDownloadFolder()
+    directory = r'C:\Users\Eyal\Downloads'
     index = 1
     for filename in os.listdir(directory):
         if filename.endswith(".mp3") and not 'fixed' in filename:
@@ -122,8 +92,8 @@ def changeNames(singer, song):
 
 
 # running over all the songs and fixed their name - deletinig the start of their name
-def fixingAllTheNames():
-    directory = findDownloadFolder()
+def fixing_all_the_names():
+    directory = r'C:\Users\Eyal\Downloads'
     for filename in os.listdir(directory):
         if filename.endswith(".mp3") and 'fixed' in filename:
             oldFileName = directory + '\\' + filename
@@ -132,32 +102,14 @@ def fixingAllTheNames():
             os.rename(oldFileName, newName)
 
 
-# finding the downloads folder
-def findDownloadFolder():
-    directory = "C:\\Users"
-    for filename in os.listdir(directory):
-        if filename.startswith('Default') or filename.startswith('public') or filename.startswith(
-                'Public') or filename.startswith('all') or filename.startswith('desktop') or filename.startswith('All'):
-            continue
-        fullFileName = directory + '\\' + filename
-        if os.path.isdir(fullFileName):
-            for subFile in dirList:
-                fullSubFile = fullFileName + '\\Downloads'
-                if ('Downloads' == subFile and os.path.isdir(fullSubFile)):
-                    return fullSubFile
-
-
-######################################
-
-# wating for bottom and clicking them
-
 # a function that waits until the download bottom is ready and clicks it
 def clickUnVisible(driver):
     TIME_TO_WAIT_EACH_TIME = 2
     link = None
     while not link:
         try:
-            driver.find_element_by_id("file").click()
+            # driver.find_element_by_id("file").click()
+            driver.find_element_by_id("download").click()
             return
         except ElementNotVisibleException:
             sleep(TIME_TO_WAIT_EACH_TIME)
@@ -166,53 +118,32 @@ def clickUnVisible(driver):
 # a function that search the convert bottom and click it
 # after a minute when the bottom wasnt found we do refresh - download this song from the beginning
 def waitingForPage(driver, downloadPath):
-    TIME_TO_WAIT_EACH_TIME = 2
-    TOTAL_TIME_TO_WAIT = 60
-
-    totalTime = 0
-    link = None
-    while not link:
-        try:
-            clickUnVisible(driver)
-            sleep(16)
-            checkIfStillDownload()
-            driver.quit()
-            return
-        except NoSuchElementException:
-            # in case that the convert bottom wasnt found
-            sleep(TIME_TO_WAIT_EACH_TIME)
-            totalTime = totalTime + TIME_TO_WAIT_EACH_TIME
-
-            # in case we wait over a minute
-            if (totalTime > TOTAL_TIME_TO_WAIT):
-                driver.quit()
-                downLoadByPath(downloadPath)
-                return
+    clickUnVisible(driver)
+    sleep(10)
+    driver.quit()
+    return
 
 
-#########################################
+def download_by_singer_names(song):
+    youtube_url_for_download = create_youtube_url_for_download(song.singer_hebrew, song.song_hebrew)
 
-# flow function
+    download_by_url(youtube_url_for_download)
 
-def downLoadBySingerAndSong(singer, song, singerName, songName):
-    downLoadPath = createSearchName(singer, song)
-    downLoadByPath(downLoadPath)
-
-    changeNames(singerName, songName)
+    changeNames(song.singer_english, song.song_english)
 
 
 # downloading a video by its path in youtube
-def downLoadByPath(downloadPath):
+def download_by_url(downloadPath):
     # the url of the website that converts videos to mp3 files
-    downLoadWebPath = 'https://ytmp3.cc/'
+    down_load_web_path = 'https://ytmp3.cc/'
 
     # openning the crome
-    driver = webdriver.Chrome()
-    driver.get(downLoadWebPath)
+    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
+    driver.get(down_load_web_path)
 
     # finding the box where we write the url to download and writing it
-    inputElement = driver.find_element_by_id("input")
-    inputElement.send_keys(downloadPath)
+    input_element = driver.find_element_by_id("input")
+    input_element.send_keys(downloadPath)
 
     # finding the bottom that converts the video to mp3 file and clicking it
     element = driver.find_element_by_id("submit")
@@ -222,65 +153,42 @@ def downLoadByPath(downloadPath):
     waitingForPage(driver, downloadPath)
 
 
-##########################################
-
-# main flow
-
 # the full function that download all the songs per language
-def downloadForLang(hebrewFilename, englishFilename, isHebrew):
-    ### reading the names of the singers and songs
-    englishData = getEnglishLinesByFileName(englishFilename)
+def download_by_files_path(hebrew_file_path, english_file_path):
 
-    if isHebrew:
-        hewbrewData = getHebrewLinesByFileName(hebrewFilename)
-        englishData[0] = englishData[0][3:]
-    else:
-        hewbrewData = getEnglishLinesByFileName(hebrewFilename)
+    with open(english_file_path, 'r') as f:
+        english_lines = f.readlines()
+
+    with open(hebrew_file_path, 'r', encoding="utf8") as f:
+        hebrew_lines = f.readlines()
 
     # running over all the singers
-    for singerIndex in range(len(hewbrewData)):
+    for hebrew_singer_line, english_singer_line in zip(hebrew_lines, english_lines):
 
-        ### parsing
-        # hebrew
-        hebrewLine = re.sub('\n', '', hewbrewData[singerIndex])
-        parts = hebrewLine.split(':')
-        # the singer name
-        hebrewSinger = parts[0]
-        # the songs
-        hebrewSongs = parts[1].split(',')
-
-        # english
-        englishLine = re.sub('\n', '', englishData[singerIndex])
-        parts = englishLine.split(':')
-        # the singer name
-        englishSinger = parts[0]
-        # the songs
-        englishSongs = parts[1].split(',')
+        hebrew_singer, hebrew_songs = extract_singer_and_song(hebrew_singer_line)
+        english_singer, english_songs = extract_singer_and_song(english_singer_line)
 
         # running over all the songs
-        for songIndex in range(len(hebrewSongs)):
-            hebrewSong = hebrewSongs[songIndex]
-            englishSong = englishSongs[songIndex]
-            print('now download: ' + englishSinger + '- ' + englishSong)
-            downLoadBySingerAndSong(hebrewSinger, hebrewSong, englishSinger, englishSong)
+        for hebrew_song, english_song in zip(hebrew_songs, english_songs):
+            song = Song(hebrew_singer, hebrew_song, english_singer, english_song)
+            print(f'now download: {english_singer} - {english_song}')
+            download_by_singer_names(song)
 
 
-#############################################
+def extract_singer_and_song(hebrew_name):
+    hebrew_name = re.sub('\n', '', hebrew_name)
+    parts = hebrew_name.split(':')
+    hebrewSinger = parts[0]
+    hebrewSongs = parts[1].split(',')
+    return hebrewSinger, hebrewSongs
+
 
 currentFolder = os.getcwd()
 
-# files name
-# fileNameEnglishSong = currentFolder + "\\" + "english song.txt"
-hebrewFilename = currentFolder + "\\" + "hebrew songs.txt"
-englishNamesFilename = currentFolder + "\\" + "hebrew names.txt"
+hebrew_names_path = os.path.join(currentFolder, "hebrew_names.txt")
+english_names_path = os.path.join(currentFolder, "english_names.txt")
 
-# download songs in english
-# downloadForLang(fileNameEnglishSong, fileNameEnglishSong, 0)
-# download songs in hebrew
-downloadForLang(hebrewFilename, englishNamesFilename, 1)
+download_by_files_path(hebrew_names_path, english_names_path)
 
 # fixing all the song names
-fixingAllTheNames()
-
-# inserting into new folder
-changeFolder()
+fixing_all_the_names()
