@@ -6,6 +6,9 @@ from main_scripts import download_by_singer_names
 from song import Song
 
 
+NUM_OF_SAMPLE = 1000
+
+
 def get_all_youtubes_names():
 
     url = r'https://www.youtube.com/user/sharimkaraokeltd/videos'
@@ -34,14 +37,14 @@ def get_names(driver):
     pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
     names = re.findall(pattern, html)
     old_names = -1
-    while not old_names == len(names) and False:
+    while not old_names == len(names) and len(names) < c:
         old_names = len(names)
         driver.execute_script("window.scrollTo(0, 100000);")
         time.sleep(1.5)
         html = driver.page_source
         pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
         names = re.findall(pattern, html)
-    return names[:2]
+    return names[:NUM_OF_SAMPLE]
 
 
 def to_english(hebrew_singer):
