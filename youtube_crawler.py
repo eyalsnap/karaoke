@@ -1,4 +1,5 @@
-from urllib import request
+import time
+from selenium import webdriver
 import re
 
 from main_scripts import download_by_singer_names
@@ -6,14 +7,15 @@ from song import Song
 
 
 def get_all_youtubes_names():
+
     url = r'https://www.youtube.com/user/sharimkaraokeltd/videos'
 
-    response = request.urlopen(url)
-    html_encoded = response.read()
-    html = html_encoded.decode()
+    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
+    driver.get(url)
 
-    pattern = 'rel="nofollow">(.*?שרים קריוקי)</a>'
-    names = re.findall(pattern, html)
+    names = get_names(driver)
+
+    driver.quit()
 
     songs = []
     for name in names:
@@ -25,6 +27,21 @@ def get_all_youtubes_names():
         songs.append(Song(hebrew_singer, hebrew_song, english_singer, english_song))
 
     return songs
+
+
+def get_names(driver):
+    html = driver.page_source
+    pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
+    names = re.findall(pattern, html)
+    old_names = -1
+    while not old_names == len(names) and False:
+        old_names = len(names)
+        driver.execute_script("window.scrollTo(0, 100000);")
+        time.sleep(1.5)
+        html = driver.page_source
+        pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
+        names = re.findall(pattern, html)
+    return names[:2]
 
 
 def to_english(hebrew_singer):

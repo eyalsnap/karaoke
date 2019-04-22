@@ -7,28 +7,14 @@ from selenium.common.exceptions import ElementNotVisibleException
 from song import Song
 
 
-def changeFolder():
-    currentFolder = os.getcwd()
-    newFolderName = currentFolder + "\\snappir list"
-    downloadFolderName = findDownloadFolder()
-    if not os.path.exists(newFolderName):
-        os.makedirs(newFolderName)
-
-    for filename in os.listdir(downloadFolderName):
-        if filename.endswith(".mp3"):
-            oldName = downloadFolderName + '\\' + filename
-            newName = newFolderName + '\\' + filename
-            os.rename(oldName, newName)
+DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\temp"
 
 
 # creating url of youtube result by given singer and song name
-def create_youtube_url_for_download(singerName, songName):
+def create_youtube_url_for_download(fullName):
     ### getting into youtube by searching the song and the singer
     # the beginning of the search url
     searchStart = "https://www.youtube.com/results?search_query="
-
-    # strcat the name of the singer and name of the song
-    fullName = singerName + songName
 
     # deleting spaces
     combinningWords = re.sub(" +", "+", fullName)
@@ -79,18 +65,6 @@ def findNewUrl(fullPath):
 
 ################################################
 
-# a function that changes the name of the last song that was downloaded
-def changeNames(singer, song):
-    directory = r'C:\Users\Eyal\Downloads'
-    index = 1
-    for filename in os.listdir(directory):
-        if filename.endswith(".mp3") and not 'fixed' in filename:
-            oldFileName = directory + '\\' + filename
-            newName = directory + '\\fixed' + str(index) + ' ' + singer + ' ' + song + '.mp3'
-            os.rename(oldFileName, newName)
-            index = index + 1
-
-
 # running over all the songs and fixed their name - deletinig the start of their name
 def fixing_all_the_names():
     directory = r'C:\Users\Eyal\Downloads'
@@ -125,32 +99,49 @@ def waitingForPage(driver, downloadPath):
 
 
 def download_by_singer_names(song):
-    youtube_url_for_download = create_youtube_url_for_download(song.singer_hebrew, song.song_hebrew)
 
-    download_by_url(youtube_url_for_download)
+    full_name = ' - '.join([song.singer_hebrew, song.song_hebrew])
+    download_dir = os.path.join(DOWNLOAD_DIRECTORY, re.sub(' ', '_', song.singer_hebrew) + '_' + re.sub(' ', '_', song.song_hebrew))
 
-    changeNames(song.singer_english, song.song_english)
+    youtube_url_for_download = create_youtube_url_for_download(full_name)
+    download_by_url(download_dir, youtube_url_for_download)
+
+    full_name = ' - '.join([song.singer_hebrew, song.song_hebrew, 'שרים קריוקי'])
+
+    youtube_url_for_download = create_youtube_url_for_download(full_name)
+    download_by_url(download_dir, youtube_url_for_download)
 
 
 # downloading a video by its path in youtube
-def download_by_url(downloadPath):
+def download_by_url(download_dir, download_url):
     # the url of the website that converts videos to mp3 files
     down_load_web_path = 'https://ytmp3.cc/'
 
+    os.makedirs(download_dir, exist_ok=True)
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("prefs", {
+        "download.default_directory": os.path.join(download_dir),
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True
+    })
+
     # openning the crome
-    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
+    # driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
+    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe', chrome_options=options)
+
     driver.get(down_load_web_path)
 
     # finding the box where we write the url to download and writing it
     input_element = driver.find_element_by_id("input")
-    input_element.send_keys(downloadPath)
+    input_element.send_keys(download_url)
 
     # finding the bottom that converts the video to mp3 file and clicking it
     element = driver.find_element_by_id("submit")
     element.click()
 
     # clicking download bottom
-    waitingForPage(driver, downloadPath)
+    waitingForPage(driver, download_url)
 
 
 # the full function that download all the songs per language
@@ -183,12 +174,14 @@ def extract_singer_and_song(hebrew_name):
     return hebrewSinger, hebrewSongs
 
 
-currentFolder = os.getcwd()
+if __name__ == '__main__':
 
-hebrew_names_path = os.path.join(currentFolder, "hebrew_names.txt")
-english_names_path = os.path.join(currentFolder, "english_names.txt")
+    currentFolder = os.getcwd()
 
-download_by_files_path(hebrew_names_path, english_names_path)
+    hebrew_names_path = os.path.join(currentFolder, "hebrew_names.txt")
+    english_names_path = os.path.join(currentFolder, "english_names.txt")
 
-# fixing all the song names
-fixing_all_the_names()
+    download_by_files_path(hebrew_names_path, english_names_path)
+
+    # fixing all the song names
+    fixing_all_the_names()
