@@ -37,7 +37,7 @@ def get_names(driver):
     pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
     names = re.findall(pattern, html)
     old_names = -1
-    while not old_names == len(names) and len(names) < c:
+    while not old_names == len(names) and len(names) < NUM_OF_SAMPLE:
         old_names = len(names)
         driver.execute_script("window.scrollTo(0, 100000);")
         time.sleep(1.5)
