@@ -8,9 +8,11 @@ from scipy.io import wavfile
 fps = 2.26e-5
 seconds = 10
 
-if __name__ == '__main__':
 
-    song_path = r'C:\Users\Eyal\Desktop\eyal\python\temp\אייל_גולן_קחי_לך_את_היום\אייל גולן - קחי לך את היום.wav'
+def main():
+
+
+    song_path = r'C:\Users\Eyal\Desktop\eyal\python\temp\אייל_גולן_קחי_לך_את_היום\אייל גולן - קחי לך את היום.mp3'
     karaoke_path = r'C:\Users\Eyal\Desktop\eyal\python\temp\אייל_גולן_קחי_לך_את_היום\קחי לך את היום - אייל גולן - שרים קריוקי.wav'
     new_path = r'C:\Users\Eyal\Desktop\eyal\python\temp\אייל_גולן_קחי_לך_את_היום\mix.wav'
 
@@ -24,3 +26,13 @@ if __name__ == '__main__':
 
     wavfile.write(new_path, transfer_fs, transfer_song)
     # wavfile.write(new_path, new_fs, new_song_data)
+
+
+if __name__ == '__main__':
+    import subprocess
+
+    name = r"C:\Users\Eyal\Desktop\eyal\python\temp\נוי_פדלון_מפחיד\מפחיד - נוי פדלון - שרים קריוקי"
+
+    subprocess.call(['ffmpeg', '-i',
+                     name + '.mp3',
+                     name + '.wav'])

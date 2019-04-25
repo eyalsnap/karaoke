@@ -7,7 +7,7 @@ from selenium.common.exceptions import ElementNotVisibleException
 from song import Song
 
 
-DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\temp"
+DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\data\songs"
 
 
 # creating url of youtube result by given singer and song name
@@ -93,7 +93,7 @@ def clickUnVisible(driver):
 # after a minute when the bottom wasnt found we do refresh - download this song from the beginning
 def waitingForPage(driver, downloadPath):
     clickUnVisible(driver)
-    sleep(10)
+    sleep(18)
     driver.quit()
     return
 
@@ -102,6 +102,10 @@ def download_by_singer_names(song):
 
     full_name = ' - '.join([song.singer_hebrew, song.song_hebrew])
     download_dir = os.path.join(DOWNLOAD_DIRECTORY, re.sub(' ', '_', song.singer_hebrew) + '_' + re.sub(' ', '_', song.song_hebrew))
+    if os.path.isdir(download_dir):
+        return
+    else:
+        os.makedirs(download_dir, exist_ok=True)
 
     youtube_url_for_download = create_youtube_url_for_download(full_name)
     download_by_url(download_dir, youtube_url_for_download)
@@ -117,7 +121,6 @@ def download_by_url(download_dir, download_url):
     # the url of the website that converts videos to mp3 files
     down_load_web_path = 'https://ytmp3.cc/'
 
-    os.makedirs(download_dir, exist_ok=True)
     options = webdriver.ChromeOptions()
     options.add_experimental_option("prefs", {
         "download.default_directory": os.path.join(download_dir),
