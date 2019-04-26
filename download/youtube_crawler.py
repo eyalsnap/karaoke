@@ -1,12 +1,10 @@
 import time
 from selenium import webdriver
 import re
-import numpy as np
-from main_scripts import download_by_singer_names
-from song import Song
+from download.downloader import download_by_song_object
+from download.song import Song
 
-
-NUM_OF_SAMPLE = 1000
+NUM_OF_SAMPLE = 6
 
 
 def get_all_youtubes_names():
@@ -20,7 +18,7 @@ def get_all_youtubes_names():
 
     driver.quit()
 
-    np.save('songs_name.npy', np.array(names))
+    # np.save('songs_name.npy', np.array(names))
 
     songs = get_songs_from_strings(names)
 
@@ -88,17 +86,21 @@ def to_english(hebrew_singer):
     return hebrew_singer
 
 
-if __name__ == '__main__':
-    # songs = get_all_youtubes_names()
-    names = np.load('songs_name.npy')
-    songs = get_songs_from_strings(names)
+def main():
+
+    songs = get_all_youtubes_names()
+    # names = np.load('songs_name.npy')
+    # songs = get_songs_from_strings(names)
     for s in songs:
         print(f'hebrew_singer : {s.singer_hebrew} - hebrew_song : {s.song_hebrew} - english_singer : {s.singer_english} - english_song : {s.song_english}')
         try:
-            download_by_singer_names(s)
+            download_by_song_object(s)
         except Exception as e:
             if hasattr(e, 'message'):
                 print(e.message)
             else:
                 print(e)
 
+
+if __name__ == '__main__':
+    main()

@@ -4,7 +4,7 @@ from scipy.io import wavfile
 import numpy as np
 
 
-class SongFile:
+class SongMetadata:
 
     def __init__(self, path):
         self.path = path
@@ -31,11 +31,3 @@ class SongFile:
         new_song.setflags(write=1)
         new_song[:bit, :] = self.data[:bit, :]
         return self.fs, new_song
-
-
-
-if __name__ == '__main__':
-    path = r'C:\Users\Eyal\Desktop\eyal\python\temp\אייל_גולן_קחי_לך_את_היום\אייל גולן - קחי לך את היום.wav'
-    a = SongFile(path)
-    print(1 / a.fs)
-    print(a.get_length() / a.data.shape[0])
