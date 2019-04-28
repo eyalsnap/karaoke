@@ -7,7 +7,7 @@ from utils.directories_function import find_song_and_karaoke_name
 
 def main():
     results = []
-    directory = r"C:\Users\EYAL\Desktop\eyal\python\data\songs"
+    directory = r"C:\Users\Eyal\Desktop\eyal\python\data"
     for file in os.listdir(directory):
         song_directory = os.path.join(directory, file)
         result = is_valid(song_directory)
@@ -33,11 +33,17 @@ def is_valid(song_directory):
 
 
 def check_song(song_directory):
+    if not os.path.isdir(song_directory):
+        return 'no dir'
+
     songs_files = os.listdir(song_directory)
     if len(songs_files) < 2:
         return 'song missing'
 
-    karaoke_name, song_name = find_song_and_karaoke_name(song_directory)
+    try:
+        karaoke_name, song_name = find_song_and_karaoke_name(song_directory)
+    except:
+        return 'karaoke missing'
 
     karaoke_path = os.path.join(song_directory, karaoke_name)
     song_path = os.path.join(song_directory, song_name)
@@ -46,7 +52,6 @@ def check_song(song_directory):
         return 'not mp3 file'
 
     if not detail_in_name(karaoke_name, song_name):
-        print(song_directory)
         return 'name is not in the song'
 
     return 'good'
