@@ -1,13 +1,15 @@
 import os
 import re
 from selenium import webdriver
+import shutil
 
+from auto_vadilation import is_valid
 from download.webdriver_functions import download_by_youtube_url_using_webdriver
 from utils.string_functions import find_first_apperence_by_regex
 
 
 DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\data\songs"
-DOWNLOAD_DIRECTORY = r"C:\Users\EYAL\Desktop\eyal\nabaz\songs\temp"
+DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\data"
 WEB_DRIVER_PATH = r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe'
 
 
@@ -26,6 +28,9 @@ def download_by_song_object(song):
     full_name = ' - '.join([song.singer_hebrew, song.song_hebrew, 'שרים קריוקי'])
     youtube_url_for_download = create_youtube_url_for_download(full_name)
     download_by_youtube_url_using_webdriver(download_dir, youtube_url_for_download)
+
+    if not is_valid(download_dir):
+        shutil.rmtree(download_dir)
 
 
 def create_youtube_url_for_download(search_expression):

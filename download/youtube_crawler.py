@@ -3,6 +3,8 @@ from selenium import webdriver
 import re
 from download.downloader import download_by_song_object
 from download.song import Song
+import numpy as np
+
 
 NUM_OF_SAMPLE = 6
 
@@ -88,9 +90,10 @@ def to_english(hebrew_singer):
 
 def main():
 
-    songs = get_all_youtubes_names()
-    # names = np.load('songs_name.npy')
-    # songs = get_songs_from_strings(names)
+    # songs = get_all_youtubes_names()
+    names = np.load('songs_name.npy')
+    songs = get_songs_from_strings(names)
+    songs = songs[:NUM_OF_SAMPLE]
     for s in songs:
         print(f'hebrew_singer : {s.singer_hebrew} - hebrew_song : {s.song_hebrew} - english_singer : {s.singer_english} - english_song : {s.song_english}')
         try:
@@ -102,5 +105,6 @@ def main():
                 print(e)
 
 
+from multiprocessing import Process
 if __name__ == '__main__':
     main()
