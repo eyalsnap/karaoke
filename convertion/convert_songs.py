@@ -24,7 +24,7 @@ def convert_songs(path_list):
     for input_path, output_path in zip(path_list, out_path_list):
         _mp3_to_wav(input_path, output_path)
     os.chdir(initial_dir)
-    return initial_dir
+    return out_path_list
 
 
 if __name__ == '__main__':
