@@ -1,13 +1,13 @@
 import os
 from mutagen.mp3 import MP3
 import numpy as np
-
+import config
 from utils.directories_function import find_song_and_karaoke_name
 
 
 def main():
     results = []
-    directory = r"C:\Users\Eyal\Desktop\eyal\python\data"
+    directory = config.data_dir
     for file in os.listdir(directory):
         song_directory = os.path.join(directory, file)
         result = is_valid(song_directory)

@@ -6,11 +6,10 @@ import shutil
 from auto_vadilation import is_valid
 from download.webdriver_functions import download_by_youtube_url_using_webdriver
 from utils.string_functions import find_first_apperence_by_regex
+import config
 
-
-DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\data\songs"
-DOWNLOAD_DIRECTORY = r"C:\Users\Eyal\Desktop\eyal\python\data"
-WEB_DRIVER_PATH = r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe'
+DOWNLOAD_DIRECTORY = config.data_dir
+WEB_DRIVER_PATH = config.web_driver_path
 
 
 def download_by_song_object(song):

@@ -4,16 +4,16 @@ import re
 from download.downloader import download_by_song_object
 from download.song import Song
 import numpy as np
+import config
 
-
-NUM_OF_SAMPLE = 6
+NUM_OF_SAMPLE = 10000
 
 
 def get_all_youtubes_names():
 
     url = r'https://www.youtube.com/user/sharimkaraokeltd/videos'
 
-    driver = webdriver.Chrome(r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe')
+    driver = webdriver.Chrome(config.web_driver_path)
     driver.get(url)
 
     names = get_names(driver)

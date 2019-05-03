@@ -1,7 +1,7 @@
 import os
-
-sox_path = r'C:\Program Files (x86)\sox-14-4-2'
-
+import config
+sox_path = config.sox_path
+main_dir = config.data_dir
 
 def _mp3_to_wav(input_path, output_path, delete=False):
     cmd = 'sox.exe ' + input_path + ' ' + output_path
@@ -26,13 +26,16 @@ def convert_songs(path_list):
     os.chdir(initial_dir)
     return out_path_list
 
+def main():
+    dirs = main_dir
 
 if __name__ == '__main__':
-    # os.chdir(sox_path)
-    # path = r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\full.mp3"
-    # out_path = r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\output.wav"
-    # _mp3_to_wav(path, out_path)
-
-    song_list = [r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\full.mp3",
-                 r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\kareokey.mp3"]
-    new_list = convert_songs(song_list)
+    # # os.chdir(sox_path)
+    # # path = r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\full.mp3"
+    # # out_path = r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\output.wav"
+    # # _mp3_to_wav(path, out_path)
+    #
+    # song_list = [r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\full.mp3",
+    #              r"C:\dev\free_time_projects\kareoke\notebooks\samples_data\eyal\kareokey.mp3"]
+    # new_list = convert_songs(song_list)
+    main()

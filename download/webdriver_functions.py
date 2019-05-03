@@ -1,9 +1,9 @@
 from selenium import webdriver
 from time import sleep
 from selenium.common.exceptions import ElementNotVisibleException
+import config
 
-
-WEB_DRIVER_PATH = r'C:\Users\Eyal\Downloads\chromedriver_win32\chromedriver.exe'
+WEB_DRIVER_PATH = config.web_driver_path
 
 
 def download_by_youtube_url_using_webdriver(download_dir, download_url):
