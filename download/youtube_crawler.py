@@ -6,7 +6,7 @@ from download.song import Song
 import numpy as np
 import config
 
-NUM_OF_SAMPLE = 10000
+NUM_OF_SAMPLE = 5
 
 
 def get_all_youtubes_names():

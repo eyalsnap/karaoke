@@ -7,14 +7,17 @@ from auto_vadilation import is_valid
 from download.webdriver_functions import download_by_youtube_url_using_webdriver
 from utils.string_functions import find_first_apperence_by_regex
 import config
+import pandas as pd
 
+METADDATA_PATH = config.meta_data_file
 DOWNLOAD_DIRECTORY = config.data_dir
 WEB_DRIVER_PATH = config.web_driver_path
 
 
 def download_by_song_object(song):
-
-    download_dir = os.path.join(DOWNLOAD_DIRECTORY, re.sub(' ', '_', song.singer_hebrew) + '_' + re.sub(' ', '_', song.song_hebrew))
+    # download_dir = os.path.join(DOWNLOAD_DIRECTORY, re.sub(' ', '_', song.singer_hebrew) + '_' + re.sub(' ', '_', song.song_hebrew))
+    download_dir = os.path.join(DOWNLOAD_DIRECTORY,
+                                re.sub(' ', '_', song.singer_english) + '_' + re.sub(' ', '_', song.song_english))
     if os.path.isdir(download_dir):
         return
     else:
@@ -24,16 +27,30 @@ def download_by_song_object(song):
     youtube_url_for_download = create_youtube_url_for_download(full_name)
     download_by_youtube_url_using_webdriver(download_dir, youtube_url_for_download)
 
+    sing_with_singer_file_list = os.listdir(download_dir)
+
     full_name = ' - '.join([song.singer_hebrew, song.song_hebrew, 'שרים קריוקי'])
     youtube_url_for_download = create_youtube_url_for_download(full_name)
     download_by_youtube_url_using_webdriver(download_dir, youtube_url_for_download)
 
     if not is_valid(download_dir):
         shutil.rmtree(download_dir)
+    else:
+        sing_with_singer_file = sing_with_singer_file_list[0]
+        kereoke_file = os.listdir(download_dir).remove(sing_with_singer_file)[0]
+        rename_basename(download_dir, sing_with_singer_file, 'origin')
+        rename_basename(download_dir, kereoke_file, 'kareoke')
+
+
+def rename_basename(dir, filename, new_basename):
+    path = os.path.join(dir, filename)
+    ext = filename.split('.')[-1]
+    new_filename = '.'.join(new_basename, ext)
+    new_path = os.path.join(dir, new_filename)
+    os.rename(path, new_path)
 
 
 def create_youtube_url_for_download(search_expression):
-
     prefix_of_youtube_search_url = "https://www.youtube.com/results?search_query="
 
     search_expression = re.sub(" +", "+", search_expression)
@@ -48,7 +65,6 @@ def create_youtube_url_for_download(search_expression):
 
 
 def find_first_video_name(youtube_search_url):
-
     regex = '"https:\/\/i.ytimg.com\/vi\/([^\/]+)\/hqdefault.jpg'
 
     driver = webdriver.Chrome(WEB_DRIVER_PATH)
