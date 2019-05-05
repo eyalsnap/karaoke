@@ -1,5 +1,6 @@
 import os
-import config
+from constants.configs import config
+
 sox_path = config.sox_path
 main_dir = config.data_dir
 

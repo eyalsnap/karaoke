@@ -1,0 +1,5 @@
+karaoke_page_signature = 'שרים קריוקי'
+metadata_table_name = 'metadata'
+songs_npy_name = 'songs_name'
+song_name = 'song.mp3'
+karaoke_name = 'karaoke.mp3'

@@ -4,17 +4,20 @@ import re
 from download.downloader import download_by_song_object
 from download.song import Song
 import numpy as np
-import config
+from constants.configs import config
+import os
+import pandas as pd
+from constants.parameters import filenames_parameters
+from constants.parameters.url_parameters import youtube_karaoke_page_url
+
 
 NUM_OF_SAMPLE = 10000
 
 
 def get_all_youtubes_names():
 
-    url = r'https://www.youtube.com/user/sharimkaraokeltd/videos'
-
     driver = webdriver.Chrome(config.web_driver_path)
-    driver.get(url)
+    driver.get(youtube_karaoke_page_url)
 
     names = get_names(driver)
 
@@ -88,23 +91,70 @@ def to_english(hebrew_singer):
     return hebrew_singer
 
 
+def save_metadata(downloaded_songs):
+    hebrew_singer = []
+    hebrew_song = []
+    english_singer = []
+    english_song = []
+    directory_name = []
+    is_karaoke = []
+    relative_url = []
+    youtube_url = []
+    for song in downloaded_songs:
+        hebrew_singer.append(song.singer_hebrew)
+        hebrew_singer.append(song.singer_hebrew)
+        hebrew_song.append(song.song_hebrew)
+        hebrew_song.append(song.song_hebrew)
+        english_singer.append(song.singer_english)
+        english_singer.append(song.singer_english)
+        english_song.append(song.song_english)
+        english_song.append(song.song_english)
+        directory_name.append(song.download_dir)
+        directory_name.append(song.download_dir)
+
+        is_karaoke.append(True)
+        relative_url.append(os.path.join(song.get_song_file_name(), filenames_parameters.karaoke_name))
+        youtube_url.append(song.karaoke_url)
+
+        is_karaoke.append(False)
+        relative_url.append(os.path.join(song.get_song_file_name(), filenames_parameters.song_name))
+        youtube_url.append(song.song_url)
+
+    df = pd.DataFrame({
+        'hebrew_singer': hebrew_singer,
+        'hebrew_song': hebrew_song,
+        'english_singer': english_singer,
+        'english_song': english_song,
+        'directory_name': directory_name,
+        'is_karaoke': is_karaoke,
+        'relative_url': relative_url,
+        'youtube_url': youtube_url
+    })
+
+    file_name = os.path.join(config.data_dir, filenames_parameters.metadata_table_name + '.csv')
+    df.to_csv(file_name, encoding='utf-8')
+
+
 def main():
+    downloaded_songs = []
 
     # songs = get_all_youtubes_names()
-    names = np.load('songs_name.npy')
+    names = np.load(filenames_parameters.songs_npy_name + '.npy')
     songs = get_songs_from_strings(names)
     songs = songs[:NUM_OF_SAMPLE]
+    songs = songs[3:6]
     for s in songs:
-        print(f'hebrew_singer : {s.singer_hebrew} - hebrew_song : {s.song_hebrew} - english_singer : {s.singer_english} - english_song : {s.song_english}')
+        s.print_me()
         try:
-            download_by_song_object(s)
+            download_by_song_object(downloaded_songs, s)
         except Exception as e:
             if hasattr(e, 'message'):
                 print(e.message)
             else:
                 print(e)
 
+    save_metadata(downloaded_songs)
 
-from multiprocessing import Process
+
 if __name__ == '__main__':
     main()

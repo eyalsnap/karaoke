@@ -1,7 +1,7 @@
 import os
 from mutagen.mp3 import MP3
 import numpy as np
-import config
+from constants.configs import config
 from utils.directories_function import find_song_and_karaoke_name
 
 

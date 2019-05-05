@@ -1,7 +1,7 @@
 from selenium import webdriver
 from time import sleep
 from selenium.common.exceptions import ElementNotVisibleException
-import config
+from constants.configs import config
 
 WEB_DRIVER_PATH = config.web_driver_path
 
