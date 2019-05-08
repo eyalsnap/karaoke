@@ -5,6 +5,7 @@ from download.downloader import download_by_song_object
 from download.song import Song
 import numpy as np
 from constants.configs import config
+from constants.configs import config_example
 import os
 import pandas as pd
 from constants.parameters import filenames_parameters
@@ -53,7 +54,7 @@ def get_names(driver):
     while not old_names == len(names) and len(names) < NUM_OF_SAMPLE:
         old_names = len(names)
         driver.execute_script("window.scrollTo(0, 100000);")
-        time.sleep(1.5)
+        time.sleep(config.sleep_time)
         html = driver.page_source
         pattern = 'views" title="(.*?שרים קריוקי)" href="/watch?'
         names = re.findall(pattern, html)
@@ -131,11 +132,16 @@ def save_metadata(downloaded_songs):
         'youtube_url': youtube_url
     })
 
-    file_name = os.path.join(config.data_dir, filenames_parameters.metadata_table_name + '.csv')
+    file_name = config.meta_data_file
     df.to_csv(file_name, encoding='utf-8')
 
 
 def main():
+    config_attributes = dir(eval('config'))
+    requested_attributes= dir(eval('config_example'))
+    if any(x not in config_attributes for x in requested_attributes):
+        raise Exception('config is not competable with config example')
+
     downloaded_songs = []
 
     # songs = get_all_youtubes_names()
@@ -143,6 +149,7 @@ def main():
     songs = get_songs_from_strings(names)
     songs = songs[:NUM_OF_SAMPLE]
     songs = songs[3:6]
+    # songs = songs[:10]
     for s in songs:
         s.print_me()
         try:
