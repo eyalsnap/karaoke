@@ -11,12 +11,10 @@ import pandas as pd
 from constants.parameters import filenames_parameters
 from constants.parameters.url_parameters import youtube_karaoke_page_url
 
-
 NUM_OF_SAMPLE = 10000
 
 
 def get_all_youtubes_names():
-
     driver = webdriver.Chrome(config.web_driver_path)
     driver.get(youtube_karaoke_page_url)
 
@@ -93,6 +91,8 @@ def to_english(hebrew_singer):
 
 
 def save_metadata(downloaded_songs):
+
+
     hebrew_singer = []
     hebrew_song = []
     english_singer = []
@@ -131,14 +131,19 @@ def save_metadata(downloaded_songs):
         'relative_url': relative_url,
         'youtube_url': youtube_url
     })
-
-    file_name = config.meta_data_file
-    df.to_csv(file_name, encoding='utf-8')
+    if os.path.exists(config.meta_data_file):
+        initial_metadata = pd.read_csv(config.meta_data_file).reset_index(drop=True)
+        if len(df) > 0:
+            df = pd.concat([df,initial_metadata], join='outer')
+        else:
+            df = initial_metadata
+    df = df.reset_index(drop=True)
+    df.to_csv(config.meta_data_file, encoding='utf-8',index=False)
 
 
 def main():
     config_attributes = dir(eval('config'))
-    requested_attributes= dir(eval('config_example'))
+    requested_attributes = dir(eval('config_example'))
     if any(x not in config_attributes for x in requested_attributes):
         raise Exception('config is not competable with config example')
 
@@ -148,8 +153,8 @@ def main():
     names = np.load(filenames_parameters.songs_npy_name + '.npy')
     songs = get_songs_from_strings(names)
     songs = songs[:NUM_OF_SAMPLE]
-    songs = songs[3:6]
-    # songs = songs[:10]
+    # songs = songs[3:6]
+    songs = songs[10:12]
     for s in songs:
         s.print_me()
         try:
