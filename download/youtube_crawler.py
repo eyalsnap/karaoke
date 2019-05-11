@@ -85,6 +85,7 @@ def to_english(hebrew_singer):
     hebrew_singer = re.sub('ך', 'h', hebrew_singer)
     hebrew_singer = re.sub('ף', 'f', hebrew_singer)
     hebrew_singer = re.sub('צ', 'ch', hebrew_singer)
+    hebrew_singer = re.sub('ץ', 'tz', hebrew_singer)
     hebrew_singer = re.sub('ם', 'm', hebrew_singer)
     hebrew_singer = re.sub('ן', 'n', hebrew_singer)
     return hebrew_singer
@@ -153,8 +154,8 @@ def main():
     names = np.load(filenames_parameters.songs_npy_name + '.npy')
     songs = get_songs_from_strings(names)
     songs = songs[:NUM_OF_SAMPLE]
-    # songs = songs[3:6]
-    songs = songs[10:12]
+    songs = songs[3:6]
+    # songs = songs[10:12]
     for s in songs:
         s.print_me()
         try:
